@@ -1,6 +1,6 @@
 package com.server;
 
-import com.server.threads.*;
+import com.server.thread.*;
 
 import java.io.*;
 import java.net.*;

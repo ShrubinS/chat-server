@@ -1,4 +1,4 @@
-package com.server.threads;
+package com.server.thread;
 
 import com.server.protocol.KnockKnockProtocol;
 
