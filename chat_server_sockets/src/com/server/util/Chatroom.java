@@ -2,13 +2,13 @@ package com.server.util;
 
 import java.util.*;
 
-public class Chatroom {
+public class ChatRoom {
     private String roomName;
     private Set<Client> connectedClients;
 
-    public Chatroom(String roomName) {
+    public ChatRoom(String roomName) {
         this.connectedClients = Collections.synchronizedSet(new HashSet<>());
-        this.roomName = roomName;
+        this.roomName = roomName.toLowerCase();
     }
 
     public String getRoomName() {
@@ -17,5 +17,20 @@ public class Chatroom {
 
     public Set<Client> getConnectedClients() {
         return connectedClients;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChatRoom chatRoom = (ChatRoom) o;
+
+        return roomName.equals(chatRoom.roomName);
+    }
+
+    @Override
+    public int hashCode() {
+        return roomName.hashCode();
     }
 }
