@@ -1,6 +1,8 @@
 package com.server;
 
+import com.server.service.ChatService;
 import com.server.thread.*;
+import com.server.util.ChatRoom;
 
 import java.io.*;
 import java.net.*;

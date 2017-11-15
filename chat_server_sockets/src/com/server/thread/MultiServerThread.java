@@ -1,16 +1,20 @@
 package com.server.thread;
 
+import com.server.protocol.ChatServerProtocol;
 import com.server.protocol.KnockKnockProtocol;
+import com.server.service.ChatService;
 
 import java.net.*;
 import java.io.*;
 
 public class MultiServerThread extends Thread {
     private Socket socket = null;
+    private volatile ChatService chatService;
 
     public MultiServerThread(Socket socket) {
         super("MultiServerThread");
         this.socket = socket;
+        this.chatService = ChatService.getInstance();
     }
 
     public void run() {
@@ -22,13 +26,11 @@ public class MultiServerThread extends Thread {
                                 socket.getInputStream()));
         ) {
             String inputLine, outputLine;
-            KnockKnockProtocol kkp = new KnockKnockProtocol();
-            outputLine = kkp.processInput(null);
-            out.println(outputLine);
+            ChatServerProtocol csp = ChatServerProtocol.getInstance();
 
             while ((inputLine = in.readLine()) != null) {
-                outputLine = kkp.processInput(inputLine);
-                out.println(outputLine);
+                outputLine = csp.getChatRoomPattern().matcher(inputLine).group(1);
+                out.println("Hi " + outputLine);
                 if (outputLine.equals("Bye"))
                     break;
             }
