@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -25,23 +26,30 @@ public class Main {
                 PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(kkSocket.getInputStream()));
+
         ) {
-            BufferedReader stdIn =
-                    new BufferedReader(new InputStreamReader(System.in));
             String fromServer;
             String fromUser;
+            BufferedReader stdIn =
+                    new BufferedReader(new InputStreamReader(System.in));
+
 
             while ((fromServer = in.readLine()) != null) {
                 System.out.println("Server: " + fromServer);
                 if (fromServer.equals("Bye."))
                     break;
 
-                fromUser = stdIn.readLine();
+                fromUser = "JOIN_CHATROOM: first\n" +
+                        "CLIENT_IP: 0\n" +
+                        "PORT: 0\n" +
+                        "CLIENT_NAME: Macbook";
+
                 if (fromUser != null) {
                     System.out.println("Client: " + fromUser);
                     out.println(fromUser);
                 }
             }
+            System.out.println("Exiting...");
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);

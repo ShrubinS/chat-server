@@ -3,9 +3,12 @@ package com.server.thread;
 import com.server.protocol.ChatServerProtocol;
 import com.server.protocol.KnockKnockProtocol;
 import com.server.service.ChatService;
+import com.sun.deploy.util.StringUtils;
 
 import java.net.*;
 import java.io.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MultiServerThread extends Thread {
     private Socket socket = null;
@@ -25,16 +28,23 @@ public class MultiServerThread extends Thread {
                         new InputStreamReader(
                                 socket.getInputStream()));
         ) {
-            String inputLine, outputLine;
+            String input, outputLine;
             ChatServerProtocol csp = ChatServerProtocol.getInstance();
+            outputLine = "Connected";
+            out.println(outputLine);
 
-            while ((inputLine = in.readLine()) != null) {
-                outputLine = csp.getChatRoomPattern().matcher(inputLine).group(1);
+//            in.lines().forEach(System.out::println);
+
+//            List<String> inp = in.lines().collect(Collectors.toList());
+
+            while ((input = in.readLine()) != null) {
+                System.out.println(input);
+                outputLine =
                 out.println("Hi " + outputLine);
                 if (outputLine.equals("Bye"))
                     break;
             }
-            socket.close();
+//            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

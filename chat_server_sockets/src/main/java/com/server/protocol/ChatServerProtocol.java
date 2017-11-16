@@ -15,7 +15,7 @@ public class ChatServerProtocol {
 
     private static final int JUST_JOINED = 0;
     private static final int OTHER = 1;
-    private static final String CHATROOM_NAME = "JOIN_CHATROOM(.*)\\n";
+    private static final String CHATROOM_NAME = "JOIN_CHATROOM: (.*)";
     private static final String CLIENT_IP = "";
     private static final String PORT = "";
     private static final String CLIENT_NAME = "";
