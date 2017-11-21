@@ -3,7 +3,6 @@ package com.server.thread;
 import com.server.protocol.ChatServerProtocol;
 import com.server.protocol.KnockKnockProtocol;
 import com.server.service.ChatService;
-import com.sun.deploy.util.StringUtils;
 
 import java.net.*;
 import java.io.*;
@@ -23,26 +22,31 @@ public class MultiServerThread extends Thread {
     public void run() {
 
         try (
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(
-                                socket.getInputStream()));
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                DataInputStream in = new DataInputStream(
+                                socket.getInputStream())
         ) {
-            String input, outputLine;
+            String fromUser, outputLine;
+            int inputLength;
             ChatServerProtocol csp = ChatServerProtocol.getInstance();
             outputLine = "Connected";
-            out.println(outputLine);
+            out.writeInt(outputLine.length());
+            out.write(outputLine.getBytes());
 
 //            in.lines().forEach(System.out::println);
 
 //            List<String> inp = in.lines().collect(Collectors.toList());
 
-            while ((input = in.readLine()) != null) {
-                System.out.println(input);
-                outputLine =
-                out.println("Hi " + outputLine);
-                if (outputLine.equals("Bye"))
-                    break;
+            while ((inputLength = in.readInt()) != 0) {
+                byte[] message = new byte[inputLength];
+                in.readFully(message, 0, message.length); // read the message
+                fromUser = new String(message);
+                System.out.println(fromUser);
+
+                outputLine = "line \nline 2";
+                byte[] outputBytes = outputLine.getBytes();
+                out.writeInt(outputBytes.length);
+                out.write(outputBytes);
             }
 //            socket.close();
         } catch (IOException e) {

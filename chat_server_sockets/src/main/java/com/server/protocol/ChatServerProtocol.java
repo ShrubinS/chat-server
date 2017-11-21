@@ -13,20 +13,8 @@ public class ChatServerProtocol {
         return instance;
     }
 
-    private static final int JUST_JOINED = 0;
-    private static final int OTHER = 1;
-    private static final String CHATROOM_NAME = "JOIN_CHATROOM: (.*)";
-    private static final String CLIENT_IP = "";
-    private static final String PORT = "";
-    private static final String CLIENT_NAME = "";
+//    public String getAction()
 
-    private static final Pattern CHATROOM_MATCH = Pattern.compile(CHATROOM_NAME);
-
-    public Pattern getChatRoomPattern() {
-        return CHATROOM_MATCH;
-    }
-
-    private int state = JUST_JOINED;
 
 
 }

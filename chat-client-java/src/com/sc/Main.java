@@ -1,9 +1,6 @@
 package com.sc;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.stream.Collectors;
@@ -22,31 +19,38 @@ public class Main {
         int portNumber = Integer.parseInt(args[1]);
 
         try (
-                Socket kkSocket = new Socket(hostName, portNumber);
-                PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(kkSocket.getInputStream()));
+                Socket socket = new Socket(hostName, portNumber);
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                DataInputStream in = new DataInputStream(socket.getInputStream())
 
         ) {
             String fromServer;
+            int fromServerLength = 0;
             String fromUser;
             BufferedReader stdIn =
                     new BufferedReader(new InputStreamReader(System.in));
 
 
-            while ((fromServer = in.readLine()) != null) {
+            while ((fromServerLength = in.readInt()) != 0) {
+                byte[] message = new byte[fromServerLength];
+                in.readFully(message, 0, message.length); // read the message
+                fromServer = new String(message);
                 System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Bye."))
-                    break;
 
-                fromUser = "JOIN_CHATROOM: first\n" +
-                        "CLIENT_IP: 0\n" +
-                        "PORT: 0\n" +
-                        "CLIENT_NAME: Macbook";
+                fromUser = stdIn.readLine();
+                if (fromUser.equals("exit"))
+                    break;
+                if(fromUser.equals("")) {
+                    fromUser = "JOIN_CHATROOM: first\n" +
+                            "CLIENT_IP: 0\n" +
+                            "PORT: 0\n" +
+                            "CLIENT_NAME: Macbook";
+                }
 
                 if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
+                    byte[] fromUserBytes = fromUser.getBytes();
+                    out.writeInt(fromUserBytes.length);
+                    out.write(fromUserBytes);
                 }
             }
             System.out.println("Exiting...");
