@@ -3,14 +3,16 @@ package com.server.util;
 public class Client {
 
     private String address;
+    private String port;
     private String name;
 
     public Client(){
 
     }
 
-    public Client(String address, String name) {
+    public Client(String address, String port, String name) {
         this.address = address;
+        this.port = port;
         this.name = name;
     }
 
@@ -21,6 +23,14 @@ public class Client {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 
     public String getName() {
@@ -38,11 +48,16 @@ public class Client {
 
         Client client = (Client) o;
 
-        return address.equals(client.address);
+        if (!address.equals(client.address)) return false;
+        if (!port.equals(client.port)) return false;
+        return name.equals(client.name);
     }
 
     @Override
     public int hashCode() {
-        return address.hashCode();
+        int result = address.hashCode();
+        result = 31 * result + port.hashCode();
+        result = 31 * result + name.hashCode();
+        return result;
     }
 }

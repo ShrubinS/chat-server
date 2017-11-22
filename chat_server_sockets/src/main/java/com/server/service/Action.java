@@ -12,9 +12,14 @@ public class Action {
         return instance;
     }
 
-    public String joinChatRoom(String chatroomName, String clientName, String iP, String port) {
+    public String joinChatRoom(String chatroomName, Client client, String iP, String port) {
         ChatService chatService = ChatService.getInstance();
-        Client client = new Client(iP, clientName);
+        String output = chatService.joinChatRoom(chatroomName, client);
+        return output;
+    }
+
+    public String leaveChatRoom(String chatroomName, Client client, String iP, String port) {
+        ChatService chatService = ChatService.getInstance();
         String output = chatService.joinChatRoom(chatroomName, client);
         return output;
     }

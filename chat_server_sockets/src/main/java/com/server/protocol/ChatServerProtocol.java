@@ -1,6 +1,7 @@
 package com.server.protocol;
 
 import com.server.service.Action;
+import com.server.util.Client;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,17 +20,29 @@ public class ChatServerProtocol {
 
     public String processRequest(String request, String port, String iP) {
         String output = "nothing happened";
-        if(request.contains("JOIN_CHATROOM")) {
-            String[] joinRequest = request.split("\n");
-            String chatroomName = joinRequest[0].split(":")[1].trim();
-            String clientIP = joinRequest[1].split(":")[1].trim();
-            String clientPort = joinRequest[2].split(":")[1].trim();
-            String clientName = joinRequest[3].split(":")[1].trim();
+        String[] joinRequest = request.split("\n");
+        if (request.contains("JOIN_CHATROOM")) {
+            String chatRoomName = ChatServerProtocol.getValue(joinRequest, 0);
+            String clientIP = ChatServerProtocol.getValue(joinRequest, 1);
+            String clientPort = ChatServerProtocol.getValue(joinRequest, 2);
+            String clientName = ChatServerProtocol.getValue(joinRequest, 3);
 
-            output = action.joinChatRoom(chatroomName, clientName, iP, port);
+            Client client = new Client(clientIP, clientPort, clientName);
+
+            output = action.joinChatRoom(chatRoomName, client, iP, port);
+        } else if (request.contains("LEAVE_CHATROOM")) {
+            String chatRoomName = ChatServerProtocol.getValue(joinRequest, 0);
+            String joinId = ChatServerProtocol.getValue(joinRequest, 1);
+            String clientName = ChatServerProtocol.getValue(joinRequest, 2);
+
+
         }
 
         return output;
+    }
+
+    private static String getValue(String[] joinRequest, int index) throws IndexOutOfBoundsException {
+        return joinRequest[index].split(":")[1].trim();
     }
 
 

@@ -1,7 +1,9 @@
 package com.server.service;
 
+import com.google.common.collect.BiMap;
 import com.server.util.ChatRoom;
 import com.server.util.Client;
+import com.server.util.Sequence;
 
 import java.util.*;
 
@@ -12,7 +14,7 @@ public class ChatService {
     private Map<String, ChatRoom> chatRooms;
 
     private ChatService() {
-        chatRooms = new HashMap<>();
+        chatRooms = Collections.synchronizedMap(new HashMap<>());
     }
 
 //    Initialization-on-demand holder idiom
@@ -33,8 +35,20 @@ public class ChatService {
             chatRooms.put(chatroomName, chatRoom);
         }
 
-        chatRoom.getConnectedClients().add(client);
-        return "client " + client.getName() + " joined chat room " + chatRoom.getRoomName();
+        Integer id;
+        BiMap<Integer, Client> connectedClients = chatRoom.getConnectedClients();
+        if (connectedClients.containsValue(client)) {
+            id = connectedClients.inverse().get(client);
+        } else {
+            id = Sequence.nextValue();
+            connectedClients.put(id, client);
+        }
+//                "JOINED_CHATROOM: [chatroom name]\n" +
+//                "SERVER_IP: [IP address of chat room]\n" +
+//                "PORT: [port number of chat room]\n" +
+//                "ROOM_REF: [integer that uniquely identifies chat room on server]\n" +
+//                "JOIN_ID: [integer that uniquely identifies client joining]"
+        return "client " + client.getName() + " joined chat room " + chatRoom.getRoomName() + " with id " + id;
     }
 
     public String leaveChatRoom(String chatRoomName, Client client) {

@@ -1,13 +1,18 @@
 package com.server.util;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
+
 import java.util.*;
 
 public class ChatRoom {
     private String roomName;
-    private Set<Client> connectedClients;
+    private BiMap<Integer, Client> connectedClients;
 
     public ChatRoom(String roomName) {
-        this.connectedClients = Collections.synchronizedSet(new HashSet<>());
+//        this.connectedClients = Collections.synchronizedMap(new HashMap<>());
+        this.connectedClients = Maps.synchronizedBiMap(HashBiMap.create());
         this.roomName = roomName.toLowerCase();
     }
 
@@ -15,7 +20,7 @@ public class ChatRoom {
         return roomName;
     }
 
-    public Set<Client> getConnectedClients() {
+    public BiMap<Integer, Client> getConnectedClients() {
         return connectedClients;
     }
 
