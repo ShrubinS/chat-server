@@ -1,2 +1,4 @@
 chat_server_sockets/out/
 chat-client-java/out/
+chat-client-java/target/
+chat_server_sockets/target/
