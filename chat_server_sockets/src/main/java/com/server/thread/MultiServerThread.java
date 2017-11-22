@@ -55,7 +55,7 @@ public class MultiServerThread extends Thread {
 
 
 
-                    outputLine = "line \nline 2";
+                    outputLine = csp.processRequest(fromUser, String.valueOf(socket.getLocalPort()), socket.getLocalAddress().toString());
 
 //                Write to bye array with length
 //                byte[] outputBytes = outputLine.getBytes();

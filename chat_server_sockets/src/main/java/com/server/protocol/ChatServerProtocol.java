@@ -18,6 +18,7 @@ public class ChatServerProtocol {
     }
 
     public String processRequest(String request, String port, String iP) {
+        String output = "nothing happened";
         if(request.contains("JOIN_CHATROOM")) {
             String[] joinRequest = request.split("\n");
             String chatroomName = joinRequest[0].split(":")[1].trim();
@@ -25,8 +26,10 @@ public class ChatServerProtocol {
             String clientPort = joinRequest[2].split(":")[1].trim();
             String clientName = joinRequest[3].split(":")[1].trim();
 
-            a
+            output = action.joinChatRoom(chatroomName, clientName, iP, port);
         }
+
+        return output;
     }
 
 

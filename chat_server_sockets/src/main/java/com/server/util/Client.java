@@ -5,6 +5,16 @@ public class Client {
     private String address;
     private String name;
 
+    public Client(){
+
+    }
+
+    public Client(String address, String name) {
+        this.address = address;
+        this.name = name;
+    }
+
+
     public String getAddress() {
         return address;
     }
