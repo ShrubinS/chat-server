@@ -53,7 +53,7 @@ public class ChatServerProtocol {
             chatService.chat(Integer.parseInt(chatRoomRef), Integer.parseInt(joinId), clientName, clientMessage);
         } else if (request.contains("HELO")) {
             String value = "HELO BASE_TEST\n" +
-                    "IP: " + serverInfo.getServerIp() + "\n" +
+                    "IP: vm-62-0-84.cloud.scss.tcd.ie\n" +
                     "Port: "+ serverInfo.getServerPort() + "\n" +
                     "StudentID: " + 17311213;
             output = new Output(value, null, null);

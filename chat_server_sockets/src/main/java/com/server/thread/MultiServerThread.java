@@ -36,7 +36,7 @@ public class MultiServerThread extends Thread {
     public void recieveMessage(ChannelMessage message) {
         // Figure out the intent of message
         if (message.getType().equals("message")) {
-            if (out != null) {
+            if (out != null && message.getMessage() != null) {
                 out.println(message.getMessage());
             }
         }
@@ -53,7 +53,6 @@ public class MultiServerThread extends Thread {
 
             while (true) {
                 if (in.ready()) {
-                    System.out.println("there are things to read in the buffer!");
 
                     StringBuilder sb = new StringBuilder();
                     char[] c = new char[] { 1024 };

@@ -82,7 +82,7 @@ public class Main {
                     fromUser = "JOIN_CHATROOM: first\n" +
                             "CLIENT_IP: 0\n" +
                             "PORT: 0\n" +
-                            "CLIENT_NAME: Macbook";
+                            "CLIENT_NAME: in-client";
                 } else if (fromUser.equals("b")) {
                     fromUser = "LEAVE_CHATROOM: 0\n" +
                             "JOIN_ID: 0\n" +
