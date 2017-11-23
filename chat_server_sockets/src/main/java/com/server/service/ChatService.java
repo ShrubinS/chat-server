@@ -69,7 +69,11 @@ public class ChatService {
         chatRoom.getConnectedClients().remove(joinId);
 
         EventBus chatRoomChannel = chatRoom.getChannel();
-        chatRoomChannel.unregister(thread);
+        try {
+            chatRoomChannel.unregister(thread);
+        } catch (Exception e) {
+            // already unregistered
+        }
         String mess =    "CHAT: " + chatRoomRef + "\n" +
                 "CLIENT_NAME:" + clientName + "\n" +
                 "MESSAGE: " + clientName + " has left this chatroom";

@@ -78,11 +78,15 @@ public class Main {
                 fromUser = stdIn.readLine();
                 if (fromUser.equals("exit"))
                     break;
-                if(fromUser.equals("")) {
+                if(fromUser.equals("a")) {
                     fromUser = "JOIN_CHATROOM: first\n" +
                             "CLIENT_IP: 0\n" +
                             "PORT: 0\n" +
                             "CLIENT_NAME: Macbook";
+                } else if (fromUser.equals("b")) {
+                    fromUser = "LEAVE_CHATROOM: 0\n" +
+                            "JOIN_ID: 0\n" +
+                            "CLIENT_NAME: client1";
                 }
 
                 if (fromUser != null) {
