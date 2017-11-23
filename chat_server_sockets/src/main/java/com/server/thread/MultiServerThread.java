@@ -47,15 +47,26 @@ public class MultiServerThread extends Thread {
 
         try {
 
-            String fromUser, outputLine;
+            String fromUser;
             ChatServerProtocol csp = ChatServerProtocol.getInstance();
+
+//            new Thread(() -> {
+//                try {
+//                    while(in.ready()) {
+//                        System.out.println(in.read());
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
 
 
             while (true) {
+
                 if (in.ready()) {
 
                     StringBuilder sb = new StringBuilder();
-                    char[] c = new char[] { 1024 };
+                    char[] c = new char[] { 4096 };
                     while (in.ready()) {
                         in.read(c);
                         sb.append(c);
@@ -63,6 +74,7 @@ public class MultiServerThread extends Thread {
 
                     fromUser = sb.toString();
                     System.out.println("Client: " + fromUser);
+                    System.out.println("c buffer: " + String.valueOf(c));
 
 
                     Output output = csp.processRequest(this, fromUser, serverInfo);
