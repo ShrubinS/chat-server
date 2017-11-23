@@ -50,6 +50,8 @@ public class ChatServerProtocol {
             String clientMessage = request.split("MESSAGE:")[1].trim();
 
             chatService.chat(Integer.parseInt(chatRoomRef), Integer.parseInt(joinId), clientName, clientMessage);
+        } else if (request.contains("HELO")) {
+            output = "HELO BASE_TEST";
         }
 
         return output;

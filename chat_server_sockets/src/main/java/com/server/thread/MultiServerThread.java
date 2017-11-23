@@ -47,8 +47,6 @@ public class MultiServerThread extends Thread {
 
             String fromUser, outputLine;
             ChatServerProtocol csp = ChatServerProtocol.getInstance();
-            outputLine = "Connected";
-            out.println(outputLine);
 
 
             while (true) {
