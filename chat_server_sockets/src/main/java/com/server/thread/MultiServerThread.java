@@ -35,7 +35,7 @@ public class MultiServerThread extends Thread {
         // Figure out the intent of message
         if (message.getType().equals("message")) {
             if (out != null) {
-                out.println(message);
+                out.println(message.getMessage());
             }
         }
     }
