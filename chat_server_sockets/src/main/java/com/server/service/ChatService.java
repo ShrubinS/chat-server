@@ -1,6 +1,8 @@
 package com.server.service;
 
 import com.google.common.collect.BiMap;
+import com.google.common.eventbus.EventBus;
+import com.server.thread.MultiServerThread;
 import com.server.util.ChatRoom;
 import com.server.util.Client;
 import com.server.util.Sequence;
@@ -27,13 +29,15 @@ public class ChatService {
         return LazyHolder.INSTANCE;
     }
 
-    public String joinChatRoom(String chatroomName, Client client) {
+    public String joinChatRoom(MultiServerThread thread, String chatroomName, Client client) {
         ChatRoom chatRoom = new ChatRoom(chatroomName);
         if (chatRooms.containsKey(chatroomName)) {
             chatRoom = chatRooms.get(chatroomName);
         } else {
             chatRooms.put(chatroomName, chatRoom);
         }
+        EventBus chatRoomChannel = chatRoom.getChannel();
+        chatRoomChannel.register(thread);
 
         Integer id;
         BiMap<Integer, Client> connectedClients = chatRoom.getConnectedClients();
@@ -48,6 +52,7 @@ public class ChatService {
 //                "PORT: [port number of chat room]\n" +
 //                "ROOM_REF: [integer that uniquely identifies chat room on server]\n" +
 //                "JOIN_ID: [integer that uniquely identifies client joining]"
+        chatRoomChannel.post(client.getName() + " joined!!");
         return "client " + client.getName() + " joined chat room " + chatRoom.getRoomName() + " with id " + id;
     }
 

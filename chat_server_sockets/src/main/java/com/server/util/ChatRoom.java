@@ -3,17 +3,20 @@ package com.server.util;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 
 import java.util.*;
 
 public class ChatRoom {
     private String roomName;
     private BiMap<Integer, Client> connectedClients;
+    private EventBus channel;
 
     public ChatRoom(String roomName) {
 //        this.connectedClients = Collections.synchronizedMap(new HashMap<>());
         this.connectedClients = Maps.synchronizedBiMap(HashBiMap.create());
         this.roomName = roomName.toLowerCase();
+        this.channel = new EventBus();
     }
 
     public String getRoomName() {
@@ -22,6 +25,10 @@ public class ChatRoom {
 
     public BiMap<Integer, Client> getConnectedClients() {
         return connectedClients;
+    }
+
+    public EventBus getChannel() {
+        return channel;
     }
 
     @Override

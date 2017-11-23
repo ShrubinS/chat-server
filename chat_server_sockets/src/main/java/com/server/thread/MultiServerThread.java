@@ -1,5 +1,6 @@
 package com.server.thread;
 
+import com.google.common.eventbus.Subscribe;
 import com.server.protocol.ChatServerProtocol;
 import com.server.service.ChatService;
 
@@ -11,39 +12,43 @@ import java.util.stream.Collectors;
 public class MultiServerThread extends Thread {
     private Socket socket = null;
     private volatile ChatService chatService;
+    private BufferedReader in;
+    private PrintWriter out;
 
     public MultiServerThread(Socket socket) {
         super("MultiServerThread");
         this.socket = socket;
         this.chatService = ChatService.getInstance();
+        try {
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
+    @Subscribe
+    public void recieveMessage(String message) {
+        if (out != null) {
+            out.println(message);
+        }
+    }
+
+    @Override
     public void run() {
 
-        try (
-//                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-//                DataInputStream in = new DataInputStream(
-//                                socket.getInputStream())
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(
-                                socket.getInputStream()))
-        ) {
+        try {
+
             String fromUser, outputLine;
-            int inputLength;
             ChatServerProtocol csp = ChatServerProtocol.getInstance();
             outputLine = "Connected";
             out.println(outputLine);
-//            out.writeInt(outputLine.length());
-//            out.write(outputLine.getBytes());
 
 
             while (true) {
                 if (in.ready()) {
-//                Read into byte array and write to String
-//                byte[] message = new byte[inputLength];
-//                in.readFully(message, 0, message.length); // read the message
-//                fromUser = new String(message);
+
                     StringBuilder sb = new StringBuilder();
                     char[] c = new char[] { 1024 };
                     while (in.ready()) {
@@ -55,13 +60,7 @@ public class MultiServerThread extends Thread {
 
 
 
-                    outputLine = csp.processRequest(fromUser, String.valueOf(socket.getLocalPort()), socket.getLocalAddress().toString());
-
-//                Write to bye array with length
-//                byte[] outputBytes = outputLine.getBytes();
-//                out.writeInt(outputBytes.length);
-//                out.write(outputBytes);
-
+                    outputLine = csp.processRequest(this, fromUser, String.valueOf(socket.getLocalPort()), socket.getLocalAddress().toString());
                     out.println(outputLine);
                 }
             }

@@ -1,5 +1,6 @@
 package com.server.service;
 
+import com.server.thread.MultiServerThread;
 import com.server.util.Client;
 
 public class Action {
@@ -12,15 +13,15 @@ public class Action {
         return instance;
     }
 
-    public String joinChatRoom(String chatroomName, Client client, String iP, String port) {
+    public String joinChatRoom(MultiServerThread thread, String chatroomName, Client client, String iP, String port) {
         ChatService chatService = ChatService.getInstance();
-        String output = chatService.joinChatRoom(chatroomName, client);
+        String output = chatService.joinChatRoom(thread, chatroomName, client);
         return output;
     }
 
-    public String leaveChatRoom(String chatroomName, Client client, String iP, String port) {
+    public String leaveChatRoom(MultiServerThread thread, String chatroomName, Client client, String iP, String port) {
         ChatService chatService = ChatService.getInstance();
-        String output = chatService.joinChatRoom(chatroomName, client);
+        String output = chatService.leaveChatRoom(chatroomName, client);
         return output;
     }
 }

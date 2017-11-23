@@ -1,6 +1,7 @@
 package com.server.protocol;
 
 import com.server.service.Action;
+import com.server.thread.MultiServerThread;
 import com.server.util.Client;
 
 import java.util.regex.Matcher;
@@ -18,7 +19,7 @@ public class ChatServerProtocol {
         return instance;
     }
 
-    public String processRequest(String request, String port, String iP) {
+    public String processRequest(MultiServerThread thread, String request, String port, String iP) {
         String output = "nothing happened";
         String[] joinRequest = request.split("\n");
         if (request.contains("JOIN_CHATROOM")) {
@@ -29,7 +30,7 @@ public class ChatServerProtocol {
 
             Client client = new Client(clientIP, clientPort, clientName);
 
-            output = action.joinChatRoom(chatRoomName, client, iP, port);
+            output = action.joinChatRoom(thread, chatRoomName, client, iP, port);
         } else if (request.contains("LEAVE_CHATROOM")) {
             String chatRoomName = ChatServerProtocol.getValue(joinRequest, 0);
             String joinId = ChatServerProtocol.getValue(joinRequest, 1);

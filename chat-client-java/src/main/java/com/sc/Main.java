@@ -20,16 +20,12 @@ public class Main {
 
         try (
                 Socket socket = new Socket(hostName, portNumber);
-//                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-//                DataInputStream in = new DataInputStream(socket.getInputStream())
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
 
         ) {
             String fromServer;
-            int fromServerLength = 0;
-            byte[] message = new byte[256];
             String fromUser;
             BufferedReader stdIn =
                     new BufferedReader(new InputStreamReader(System.in));
@@ -58,21 +54,26 @@ public class Main {
 //                }
 //            }
 
-            while (true) {
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        if (in.ready()) {
+                            StringBuilder sb = new StringBuilder();
+                            char[] c = new char[] { 1024 };
+                            while (in.ready()) {
+                                in.read(c);
+                                sb.append(c);
+                            }
+                            System.out.println("Server: " + sb.toString());
 
-                if (in.ready()) {
-                    StringBuilder sb = new StringBuilder();
-                    char[] c = new char[] { 1024 };
-                    while (in.ready()) {
-                        in.read(c);
-                        sb.append(c);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-//                in.readFully(message, 0, message.length); // read the message
-//                fromServer = new String(message);
-                    fromServer = sb.toString();
-                    System.out.println("Server: " + fromServer);
-
                 }
+            }).start();
+
+            while (true) {
 
                 fromUser = stdIn.readLine();
                 if (fromUser.equals("exit"))
