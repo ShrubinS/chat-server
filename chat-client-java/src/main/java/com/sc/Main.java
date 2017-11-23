@@ -87,6 +87,8 @@ public class Main {
                     fromUser = "LEAVE_CHATROOM: 0\n" +
                             "JOIN_ID: 0\n" +
                             "CLIENT_NAME: client1";
+                } else if (fromUser.equals("c")) {
+                    fromUser = "HELO BASE_TEST";
                 }
 
                 if (fromUser != null) {

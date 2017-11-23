@@ -53,6 +53,7 @@ public class MultiServerThread extends Thread {
 
             while (true) {
                 if (in.ready()) {
+                    System.out.println("there are things to read in the buffer!");
 
                     StringBuilder sb = new StringBuilder();
                     char[] c = new char[] { 1024 };
