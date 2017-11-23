@@ -50,7 +50,7 @@ public class ChatService {
             id = Sequence.nextJoinId();
             connectedClients.put(id, client);
         }
-        String mess =    "CHAT: " + chatRoomRef + "\n" +
+        String mess = "CHAT: " + chatRoomRef + "\n" +
                 "CLIENT_NAME:" + client.getName() + "\n" +
                 "MESSAGE: " + client.getName() + " has joined this chatroom";
         ChannelMessage message = new ChannelMessage("message", mess);
@@ -65,7 +65,12 @@ public class ChatService {
     }
 
     public Output leaveChatRoom(MultiServerThread thread, Integer chatRoomRef, Integer joinId, String clientName) {
+        boolean alreadyGone = false;
+        String mess = null;
         ChatRoom chatRoom = chatRooms.get(chatRoomRef);
+        if (!chatRoom.getConnectedClients().containsKey(joinId)) {
+            alreadyGone = true;
+        }
         chatRoom.getConnectedClients().remove(joinId);
 
         EventBus chatRoomChannel = chatRoom.getChannel();
@@ -74,9 +79,12 @@ public class ChatService {
         } catch (Exception e) {
             // already unregistered
         }
-        String mess =    "CHAT: " + chatRoomRef + "\n" +
-                "CLIENT_NAME:" + clientName + "\n" +
-                "MESSAGE: " + clientName + " has left this chatroom";
+
+        if (!alreadyGone) {
+            mess = "CHAT: " + chatRoomRef + "\n" +
+                    "CLIENT_NAME:" + clientName + "\n" +
+                    "MESSAGE: " + clientName + " has left this chatroom";
+        }
         ChannelMessage message = new ChannelMessage("message", mess);
 //        chatRoomChannel.post(message);
         String retVal = "LEFT_CHATROOM: " + chatRoomRef + "\n" +
