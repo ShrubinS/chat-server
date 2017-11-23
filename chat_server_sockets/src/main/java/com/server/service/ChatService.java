@@ -30,7 +30,7 @@ public class ChatService {
         return LazyHolder.INSTANCE;
     }
 
-    public String joinChatRoom(MultiServerThread thread, String chatroomName, Client client, ServerInfo serverInfo) {
+    public Output joinChatRoom(MultiServerThread thread, String chatroomName, Client client, ServerInfo serverInfo) {
         ChatRoom chatRoom = new ChatRoom(chatroomName);
         Integer chatRoomRef;
         if (chatRooms.inverse().containsKey(chatRoom)) {
@@ -41,7 +41,7 @@ public class ChatService {
             chatRooms.put(chatRoomRef, chatRoom);
         }
         EventBus chatRoomChannel = chatRoom.getChannel();
-
+        chatRoomChannel.register(thread);
         Integer id;
         BiMap<Integer, Client> connectedClients = chatRoom.getConnectedClients();
         if (connectedClients.containsValue(client)) {
@@ -50,47 +50,50 @@ public class ChatService {
             id = Sequence.nextJoinId();
             connectedClients.put(id, client);
         }
-        ChannelMessage message = new ChannelMessage("message", client.getName() + " joined the chatroom " + chatRoom.getRoomName());
-        chatRoomChannel.post(message);
-        chatRoomChannel.register(thread);
+        ChannelMessage message = new ChannelMessage("message", client.getName() + " has joined this chatroom " + chatRoom.getRoomName());
+//        chatRoomChannel.post(message);
         String retVal = "JOINED_CHATROOM: " + chatroomName +"\n" +
                 "SERVER_IP: " + serverInfo.getServerIp() +"\n" +
                 "PORT: " + serverInfo.getServerPort() +"\n" +
                 "ROOM_REF: " + chatRoomRef +"\n" +
                 "JOIN_ID: " + id;
-        return retVal;
+
+        return new Output(retVal, chatRoomChannel, message);
     }
 
-    public String leaveChatRoom(MultiServerThread thread, Integer chatRoomRef, Integer joinId, String clientName) {
+    public Output leaveChatRoom(MultiServerThread thread, Integer chatRoomRef, Integer joinId, String clientName) {
         ChatRoom chatRoom = chatRooms.get(chatRoomRef);
         chatRoom.getConnectedClients().remove(joinId);
 
         EventBus chatRoomChannel = chatRoom.getChannel();
         chatRoomChannel.unregister(thread);
         ChannelMessage message = new ChannelMessage("message", "client " + clientName + " left the chat room " + chatRoom.getRoomName());
-        chatRoomChannel.post(message);
+//        chatRoomChannel.post(message);
         String retVal = "LEFT_CHATROOM: " + chatRoomRef + "\n" +
                         "JOIN_ID: " + joinId;
-        return retVal;
+        return new Output(retVal, chatRoomChannel, message);
     }
 
-    public String leaveAllChatRooms(MultiServerThread thread, Client client) {
+    public Output leaveAllChatRooms(MultiServerThread thread, Client client) {
         chatRooms.forEach((chatRoomRef, chatRoom) -> {
             BiMap<Integer, Client> connectedClients = chatRoom.getConnectedClients();
             if (connectedClients.inverse().containsKey(client)) {
                 leaveChatRoom(thread, chatRoomRef, connectedClients.inverse().get(client), client.getName());
             }
         });
-        return "Disconnecting...";
+        return new Output("Disconnecting...", null, null);
     }
 
-    public void chat(Integer chatRoomRef, Integer joinId, String clientName, String clientMessage) {
+    public Output chat(Integer chatRoomRef, Integer joinId, String clientName, String clientMessage) {
         ChatRoom chatRoom = chatRooms.get(chatRoomRef);
+        ChannelMessage message = new ChannelMessage("", "");
         if (chatRoom.getConnectedClients().containsKey(joinId)) {
             String val =    "CHAT: " + chatRoomRef + "\n" +
                             "CLIENT_NAME:" + clientName + "\n" +
                             "MESSAGE: " + clientMessage;
-            ChannelMessage message = new ChannelMessage("message", val);
+            message = new ChannelMessage("message", val);
         }
+        EventBus chatRoomChannel = chatRoom.getChannel();
+        return new Output("", chatRoomChannel, message);
     }
 }

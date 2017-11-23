@@ -1,9 +1,11 @@
 package com.server.thread;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.server.protocol.ChatServerProtocol;
 import com.server.service.ChatService;
 import com.server.util.ChannelMessage;
+import com.server.util.Output;
 import com.server.util.ServerInfo;
 
 import java.net.*;
@@ -62,13 +64,22 @@ public class MultiServerThread extends Thread {
                     fromUser = sb.toString();
                     System.out.println("Client: " + fromUser);
 
-                    outputLine = csp.processRequest(this, fromUser, serverInfo);
+
+                    Output output = csp.processRequest(this, fromUser, serverInfo);
 
                     if (fromUser.contains("KILL_SERVICE")) {
                         System.exit(0);
                     }
 
-                    out.println(outputLine);
+                    if (output != null) {
+                        if (output.getOutputMessage() != null && !output.getOutputMessage().isEmpty()) {
+                            out.println(output.getOutputMessage());
+                        }
+
+                        if (output.getChannel() != null && output.getChannelMessage() != null) {
+                            output.getChannel().post(output.getChannelMessage());
+                        }
+                    }
 
                     if (fromUser.contains("DISCONNECT")) {
                         break;

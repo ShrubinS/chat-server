@@ -3,6 +3,7 @@ package com.server.protocol;
 import com.server.service.ChatService;
 import com.server.thread.MultiServerThread;
 import com.server.util.Client;
+import com.server.util.Output;
 import com.server.util.ServerInfo;
 
 public class ChatServerProtocol {
@@ -17,8 +18,8 @@ public class ChatServerProtocol {
         return instance;
     }
 
-    public String processRequest(MultiServerThread thread, String request, ServerInfo serverInfo) {
-        String output = "";
+    public Output processRequest(MultiServerThread thread, String request, ServerInfo serverInfo) {
+        Output output = null;
         String[] joinRequest = request.split("\n");
         if (request.contains("JOIN_CHATROOM")) {
             String chatRoomName = ChatServerProtocol.getValue(joinRequest, 0);
@@ -51,10 +52,11 @@ public class ChatServerProtocol {
 
             chatService.chat(Integer.parseInt(chatRoomRef), Integer.parseInt(joinId), clientName, clientMessage);
         } else if (request.contains("HELO")) {
-            output = "HELO BASE_TEST\n" +
+            String value = "HELO BASE_TEST\n" +
                     "IP: " + serverInfo.getServerIp() + "\n" +
                     "Port: "+ serverInfo.getServerPort() + "\n" +
                     "StudentID: " + 17311213;
+            output = new Output(value, null, null);
         }
 
         return output;
