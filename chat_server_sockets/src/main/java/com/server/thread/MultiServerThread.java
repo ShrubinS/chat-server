@@ -20,7 +20,7 @@ public class MultiServerThread extends Thread {
     public MultiServerThread(Socket socket) {
         super("MultiServerThread");
         this.socket = socket;
-        serverInfo = new ServerInfo(socket.getLocalAddress().toString(), String.valueOf(socket.getLocalPort()));
+        serverInfo = new ServerInfo(String.valueOf(socket.getInetAddress()).replace("/", ""), String.valueOf(socket.getLocalPort()));
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);

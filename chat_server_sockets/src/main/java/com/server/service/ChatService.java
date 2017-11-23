@@ -54,8 +54,8 @@ public class ChatService {
         chatRoomChannel.post(message);
         chatRoomChannel.register(thread);
         String retVal = "JOINED_CHATROOM: " + chatroomName +"\n" +
-                "SERVER_IP: " + 0 +"\n" +
-                "PORT: " + 0 +"\n" +
+                "SERVER_IP: " + serverInfo.getServerIp() +"\n" +
+                "PORT: " + serverInfo.getServerPort() +"\n" +
                 "ROOM_REF: " + chatRoomRef +"\n" +
                 "JOIN_ID: " + id;
         return retVal;
