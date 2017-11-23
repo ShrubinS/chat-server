@@ -1,22 +1,23 @@
 package com.server.service;
 
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.server.thread.MultiServerThread;
-import com.server.util.ChatRoom;
-import com.server.util.Client;
-import com.server.util.Sequence;
+import com.server.util.*;
 
+import java.text.Bidi;
 import java.util.*;
 
 // Using a singleton instead of a static class
 public class ChatService {
 
     private ChatService instance = null;
-    private Map<String, ChatRoom> chatRooms;
+    private BiMap<Integer, ChatRoom> chatRooms;
 
     private ChatService() {
-        chatRooms = Collections.synchronizedMap(new HashMap<>());
+        chatRooms = Maps.synchronizedBiMap(HashBiMap.create());
     }
 
 //    Initialization-on-demand holder idiom
@@ -29,12 +30,15 @@ public class ChatService {
         return LazyHolder.INSTANCE;
     }
 
-    public String joinChatRoom(MultiServerThread thread, String chatroomName, Client client) {
+    public String joinChatRoom(MultiServerThread thread, String chatroomName, Client client, ServerInfo serverInfo) {
         ChatRoom chatRoom = new ChatRoom(chatroomName);
-        if (chatRooms.containsKey(chatroomName)) {
-            chatRoom = chatRooms.get(chatroomName);
+        Integer chatRoomRef;
+        if (chatRooms.inverse().containsKey(chatRoom)) {
+            chatRoomRef = chatRooms.inverse().get(chatRoom);
+            chatRoom = chatRooms.get(chatRoomRef);
         } else {
-            chatRooms.put(chatroomName, chatRoom);
+            chatRoomRef = Sequence.nextRoomRef();
+            chatRooms.put(chatRoomRef, chatRoom);
         }
         EventBus chatRoomChannel = chatRoom.getChannel();
         chatRoomChannel.register(thread);
@@ -44,25 +48,49 @@ public class ChatService {
         if (connectedClients.containsValue(client)) {
             id = connectedClients.inverse().get(client);
         } else {
-            id = Sequence.nextValue();
+            id = Sequence.nextJoinId();
             connectedClients.put(id, client);
         }
-//                "JOINED_CHATROOM: [chatroom name]\n" +
-//                "SERVER_IP: [IP address of chat room]\n" +
-//                "PORT: [port number of chat room]\n" +
-//                "ROOM_REF: [integer that uniquely identifies chat room on server]\n" +
-//                "JOIN_ID: [integer that uniquely identifies client joining]"
-        chatRoomChannel.post(client.getName() + " joined!!");
-        return "client " + client.getName() + " joined chat room " + chatRoom.getRoomName() + " with id " + id;
+        ChannelMessage message = new ChannelMessage("message", client.getName() + " joined the chatroom " + chatRoom.getRoomName());
+        chatRoomChannel.post(message);
+        String retVal = "JOINED_CHATROOM: " + chatroomName +"\n" +
+                "SERVER_IP: " + serverInfo.getServerIp() +"\n" +
+                "PORT: " + serverInfo.getServerPort() +"\n" +
+                "ROOM_REF: " + chatRoomRef +"\n" +
+                "JOIN_ID: " + id;
+        return retVal;
     }
 
-    public String leaveChatRoom(String chatRoomName, Client client) {
-        ChatRoom chatRoom = chatRooms.get(chatRoomName);
-        chatRoom.getConnectedClients().remove(client);
-        return "client " + client.getName() + " left the chat room " + chatRoom.getRoomName();
+    public String leaveChatRoom(MultiServerThread thread, Integer chatRoomRef, Integer joinId, String clientName) {
+        ChatRoom chatRoom = chatRooms.get(chatRoomRef);
+        chatRoom.getConnectedClients().remove(joinId);
+
+        EventBus chatRoomChannel = chatRoom.getChannel();
+        chatRoomChannel.unregister(thread);
+        ChannelMessage message = new ChannelMessage("message", "client " + clientName + " left the chat room " + chatRoom.getRoomName());
+        chatRoomChannel.post(message);
+        String retVal = "LEFT_CHATROOM: " + chatRoomRef + "\n" +
+                        "JOIN_ID: " + joinId;
+        return retVal;
     }
 
-    public String sayStuff(String stuff, Client client) {
-        return "";
+    public String leaveAllChatRooms(MultiServerThread thread, Client client) {
+        chatRooms.forEach((chatRoomRef, chatRoom) -> {
+            BiMap<Integer, Client> connectedClients = chatRoom.getConnectedClients();
+            if (connectedClients.inverse().containsKey(client)) {
+                leaveChatRoom(thread, chatRoomRef, connectedClients.inverse().get(client), client.getName());
+            }
+        });
+        return "Disconnecting...";
+    }
+
+    public void chat(Integer chatRoomRef, Integer joinId, String clientName, String clientMessage) {
+        ChatRoom chatRoom = chatRooms.get(chatRoomRef);
+        if (chatRoom.getConnectedClients().containsKey(joinId)) {
+            String val =    "CHAT: " + chatRoomRef + "\n" +
+                            "CLIENT_NAME:" + clientName + "\n" +
+                            "MESSAGE: " + clientMessage;
+            ChannelMessage message = new ChannelMessage("message", val);
+        }
     }
 }

@@ -21,6 +21,7 @@ public class Server {
         boolean listening = true;
 
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
+            System.out.println("Server started: " + serverSocket);
             while (listening) {
                 new MultiServerThread(serverSocket.accept()).start();
             }
