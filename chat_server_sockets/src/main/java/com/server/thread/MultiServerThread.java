@@ -64,6 +64,10 @@ public class MultiServerThread extends Thread {
 
                     outputLine = csp.processRequest(this, fromUser, serverInfo);
 
+                    if (fromUser.contains("KILL_SERVICE")) {
+                        System.exit(0);
+                    }
+
                     out.println(outputLine);
 
                     if (fromUser.contains("DISCONNECT")) {
