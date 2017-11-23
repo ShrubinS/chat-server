@@ -50,7 +50,10 @@ public class ChatService {
             id = Sequence.nextJoinId();
             connectedClients.put(id, client);
         }
-        ChannelMessage message = new ChannelMessage("message", client.getName() + " has joined this chatroom " + chatRoom.getRoomName());
+        String mess =    "CHAT: " + chatRoomRef + "\n" +
+                "CLIENT_NAME:" + client.getName() + "\n" +
+                "MESSAGE: " + client.getName() + " has joined this chatroom";
+        ChannelMessage message = new ChannelMessage("message", mess);
 //        chatRoomChannel.post(message);
         String retVal = "JOINED_CHATROOM: " + chatroomName +"\n" +
                 "SERVER_IP: " + serverInfo.getServerIp() +"\n" +
@@ -67,7 +70,10 @@ public class ChatService {
 
         EventBus chatRoomChannel = chatRoom.getChannel();
         chatRoomChannel.unregister(thread);
-        ChannelMessage message = new ChannelMessage("message", "client " + clientName + " left the chat room " + chatRoom.getRoomName());
+        String mess =    "CHAT: " + chatRoomRef + "\n" +
+                "CLIENT_NAME:" + clientName + "\n" +
+                "MESSAGE: " + clientName + " has left this chatroom";
+        ChannelMessage message = new ChannelMessage("message", mess);
 //        chatRoomChannel.post(message);
         String retVal = "LEFT_CHATROOM: " + chatRoomRef + "\n" +
                         "JOIN_ID: " + joinId;
