@@ -62,6 +62,4 @@ public class ChatServerProtocol {
         return joinRequest[index].split(":")[1].trim();
     }
 
-
-
 }

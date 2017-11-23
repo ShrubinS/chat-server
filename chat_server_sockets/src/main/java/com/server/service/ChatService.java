@@ -41,7 +41,6 @@ public class ChatService {
             chatRooms.put(chatRoomRef, chatRoom);
         }
         EventBus chatRoomChannel = chatRoom.getChannel();
-        chatRoomChannel.register(thread);
 
         Integer id;
         BiMap<Integer, Client> connectedClients = chatRoom.getConnectedClients();
@@ -53,6 +52,7 @@ public class ChatService {
         }
         ChannelMessage message = new ChannelMessage("message", client.getName() + " joined the chatroom " + chatRoom.getRoomName());
         chatRoomChannel.post(message);
+        chatRoomChannel.register(thread);
         String retVal = "JOINED_CHATROOM: " + chatroomName +"\n" +
                 "SERVER_IP: " + serverInfo.getServerIp() +"\n" +
                 "PORT: " + serverInfo.getServerPort() +"\n" +
