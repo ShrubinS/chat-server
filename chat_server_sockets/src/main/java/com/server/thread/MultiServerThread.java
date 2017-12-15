@@ -7,6 +7,7 @@ import com.server.service.ChatService;
 import com.server.util.ChannelMessage;
 import com.server.util.Output;
 import com.server.util.ServerInfo;
+import org.apache.commons.io.IOUtils;
 
 import java.net.*;
 import java.io.*;
@@ -17,6 +18,7 @@ public class MultiServerThread extends Thread {
     private Socket socket = null;
     private ServerInfo serverInfo;
     private BufferedReader in;
+    private BufferedReader getIn;
     private PrintWriter out;
 
     public MultiServerThread(Socket socket) {
@@ -52,8 +54,16 @@ public class MultiServerThread extends Thread {
 
 //            new Thread(() -> {
 //                try {
-//                    while(in.ready()) {
-//                        System.out.println(in.read());
+//                    while(true) {
+//                        if (in.ready()) {
+//                            ByteArrayOutputStream temp = new ByteArrayOutputStream();
+//                            IOUtils.copy(socket.getInputStream(), temp);
+//                            byte[] bytes = temp.toByteArray();
+//                            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+//                            while(bais.available() > 0) {
+//                                System.out.println((char)bais.read());
+//                            }
+//                        }
 //                    }
 //                } catch (IOException e) {
 //                    e.printStackTrace();
@@ -74,7 +84,6 @@ public class MultiServerThread extends Thread {
 
                     fromUser = sb.toString();
                     System.out.println("Client: " + fromUser);
-                    System.out.println("c buffer: " + String.valueOf(c));
 
 
                     Output output = csp.processRequest(this, fromUser, serverInfo);
